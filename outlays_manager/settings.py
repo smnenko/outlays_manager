@@ -9,11 +9,7 @@ PROJECT_DIR = Path(__file__).resolve().parent
 BASE_DIR = PROJECT_DIR.parent
 sys.path.append(os.path.join(PROJECT_DIR, 'apps'))
 
-ENVIRONMENT = (
-    'DEVELOPMENT'
-    if BASE_DIR.joinpath('.env').exists() or os.environ.get('ENVIRONMENT') == 'DEVELOPMENT'
-    else 'PRODUCTION'
-)
+ENVIRONMENT = 'PRODUCTION' if os.environ.get('ENVIRONMENT') == 'PRODUCTION' else 'DEVELOPMENT'
 
 if ENVIRONMENT == 'DEVELOPMENT':
     from dotenv import load_dotenv
