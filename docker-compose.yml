@@ -1,19 +1,44 @@
 version: "3.9"
 services:
-  web:
-    build: .
+  redis:
+    image: redis:latest
     ports:
-    - "8000:8000"
-    command: pipenv run python manage.py runserver 0.0.0.0:8000
-    volumes:
-    - .:/outlays_manager
-    depends_on:
-      - db
+      - "6379:6379"
 
   db:
     image: postgres:13
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: outlays_manager
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}" ]
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    command: pipenv run python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - web:/outlays_manager
+    depends_on:
+      - db
+      - redis
+
+  celery:
+    restart: always
+    build:
+      context: .
+    command: pipenv run celery -A outlays_manager worker --beat -l info
+    volumes:
+      - web:/outlays_manager
+    depends_on:
+      - web
 
 volumes:
+  web:
   postgres_data:
