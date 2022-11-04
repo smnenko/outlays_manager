@@ -185,7 +185,7 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_BEAT_SCHEDULE = {
     'send_user_statistics_email': {
         'task': 'core.tasks.send_user_statistics_email',
-        'schedule': crontab(minute='*')
+        'schedule': crontab(minute='0', hour='6')
     }
 }
 
